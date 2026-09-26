@@ -1,0 +1,1750 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js",
+                "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/"
+            }
+        }
+    </script>
+    <style>
+        :root {
+            font-size: clamp(15px, calc(14px + 0.25vw), 19px);
+            --bg: #F5F7FA;
+            --nav: #223A48;
+            --primary: #3CA3D6;
+            --footer: #2E4E60;
+            --viewer-bg: #E6EBEF;
+            --text: #0F1B20;
+            --muted: #6B7A82;
+            scrollbar-width: none;
+        }
+
+        html::-webkit-scrollbar {
+            display: none;
+        }
+
+        .page-scrollbar {
+            position: fixed;
+            top: 0;
+            right: 0;
+            bottom: 52px;
+            z-index: 49;
+            width: 14px;
+            background: var(--bg);
+            touch-action: none;
+            user-select: none;
+        }
+
+        .page-scrollbar[hidden] {
+            display: none;
+        }
+
+        .page-scrollbar-control {
+            position: absolute;
+            right: 0;
+            z-index: 2;
+            display: grid;
+            width: 14px;
+            height: 16px;
+            place-items: center;
+            padding: 0;
+            border: 0;
+            background: var(--bg);
+            cursor: pointer;
+        }
+
+        .page-scrollbar-control:hover {
+            background: rgba(60,163,214,0.18);
+        }
+
+        .page-scrollbar-control:disabled {
+            cursor: default;
+            opacity: 0.45;
+        }
+
+        .page-scrollbar-control:focus-visible {
+            outline: 2px solid var(--primary);
+            outline-offset: -2px;
+        }
+
+        .page-scrollbar-control::before {
+            width: 0;
+            height: 0;
+            border-right: 4px solid transparent;
+            border-left: 4px solid transparent;
+            content: '';
+        }
+
+        .page-scrollbar-up {
+            top: 0;
+        }
+
+        .page-scrollbar-up::before {
+            border-bottom: 5px solid var(--nav);
+        }
+
+        .page-scrollbar-down {
+            bottom: 0;
+        }
+
+        .page-scrollbar-down::before {
+            border-top: 5px solid var(--nav);
+        }
+
+        .page-scrollbar-thumb {
+            position: absolute;
+            top: 0;
+            right: 3px;
+            width: 8px;
+            min-height: 28px;
+            border-radius: 999px;
+            background: var(--footer);
+            cursor: grab;
+        }
+
+        .page-scrollbar:hover .page-scrollbar-thumb {
+            background: var(--nav);
+        }
+
+        .page-scrollbar:focus-visible {
+            outline: 2px solid var(--primary);
+            outline-offset: -2px;
+        }
+
+        .page-scrollbar:active .page-scrollbar-thumb {
+            cursor: grabbing;
+        }
+
+        img {
+            border-radius: 8px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            padding-bottom: 64px;
+        }
+
+        body.contact-info-open {
+            padding-bottom: 180px;
+        }
+
+        nav {
+            /* nav becomes the distinct top card */
+            background-color: #ffffff;
+            padding: 0.6rem 1rem;
+            position: sticky;
+            top: 12px;
+            z-index: 1000;
+            pointer-events: auto;
+            display: flex;
+            align-items: center;
+            margin: 0 1rem 1rem 1rem;
+            border-radius: 10px;
+            box-shadow: 0 6px 20px rgba(15,27,32,0.06);
+        }
+
+        .nav-toggle {
+            display: none;
+            width: 44px;
+            height: 40px;
+            padding: 0;
+            border: 0;
+            background: transparent;
+            cursor: pointer;
+        }
+
+        .nav-mobile-shortcuts {
+            display: none;
+        }
+
+        .nav-toggle span {
+            width: 24px;
+            height: 2px;
+            border-radius: 2px;
+            background: var(--text);
+        }
+
+        .nav-toggle:focus-visible {
+            outline: 2px solid var(--primary);
+            outline-offset: 2px;
+        }
+
+        .nav-links {
+            flex: 1;
+            min-width: 0;
+            margin-left: auto;
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.75rem;
+            align-items: center;
+            overflow: visible;
+        }
+
+        nav a {
+            flex: 0 0 auto;
+            color: var(--text);
+            margin: 0 0.25rem;
+            text-decoration: none;
+            cursor: pointer;
+            font-weight: 700; /* bold tabs */
+            padding: 0.25rem 0.5rem; /* small padded area for rounded highlight */
+            border-radius: 8px;
+            transition: background-color 120ms ease, color 120ms ease;
+        }
+
+        /* Highlight a small rounded rectangle around nav item on hover/focus using primary */
+        nav a:hover,
+        nav a:focus,
+        nav a:active {
+            background: rgba(60,163,214,0.12); /* primary with slight opacity */
+            text-decoration: none;
+            outline: none;
+        }
+
+        .nav-category {
+            position: relative;
+            flex: 0 0 auto;
+        }
+
+        .nav-category > summary {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 0.25rem 0.5rem;
+            border-radius: 8px;
+            font-weight: 700;
+            list-style: none;
+            white-space: nowrap;
+            cursor: pointer;
+        }
+
+        .nav-category > summary::-webkit-details-marker {
+            display: none;
+        }
+
+        .nav-category > summary::after {
+            width: 6px;
+            height: 6px;
+            border-right: 1.5px solid currentColor;
+            border-bottom: 1.5px solid currentColor;
+            content: '';
+            transform: rotate(45deg);
+        }
+
+        .nav-category[open] > summary::after {
+            transform: rotate(225deg);
+        }
+
+        .nav-category > summary:hover,
+        .nav-category > summary:focus-visible {
+            background: rgba(60,163,214,0.12);
+            outline: none;
+        }
+
+        .nav-desktop-submenu {
+            position: absolute;
+            top: calc(100% + 0.5rem);
+            right: 0;
+            z-index: 1001;
+            display: flex;
+            min-width: max-content;
+            flex-direction: column;
+            gap: 0.25rem;
+            padding: 0.4rem;
+            border-radius: 8px;
+            background: #fff;
+            box-shadow: 0 6px 20px rgba(15,27,32,0.16);
+        }
+
+        .nav-desktop-submenu a {
+            display: block;
+            margin: 0;
+            text-align: right;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 2rem;
+            gap: 1rem;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .header-left {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start; /* left-align name and subtitle */
+        }
+
+        .subtitle {
+            font-size: 0.9rem;
+            color: rgba(43,43,43,0.85);
+            margin-bottom: 0.25rem;
+            font-weight: 300;
+        }
+
+        .header h1 {
+            font-size: 2.25rem;
+            margin-bottom: 0;
+            font-weight: 600;
+        }
+
+        .header img {
+            width: 140px;
+            height: 140px;
+            border-radius: 12px;
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+
+        .cta-buttons {
+            margin-top: 0.75rem;
+            display: flex;
+            gap: 0.6rem;
+        }
+
+        .cta-button {
+            padding: 0.45rem 0.9rem;
+            border-radius: 8px;
+            text-decoration: none;
+            cursor: pointer;
+            font-weight: 600;
+            color: #fff;
+            background: var(--primary);
+            border: none;
+            transition: filter 140ms ease, transform 120ms ease;
+        }
+
+        .cta-button.primary { background: var(--primary); }
+
+        .cta-buttons .cta-button {
+            font-weight: 700;
+        }
+
+        .cta-button:hover { filter: brightness(0.95); transform: translateY(-1px); }
+
+        /* Footer */
+        .site-footer {
+            position: fixed;
+            left: 0;
+            right: calc(100% - 100vw);
+            bottom: 0;
+            background-color: var(--footer);
+            color: #ffffff;
+            padding: 0.4rem 1rem;
+            box-shadow: 0 -2px 8px rgba(0,0,0,0.06);
+            z-index: 50;
+            font-size: 0.95rem;
+        }
+
+        .footer-disclosure {
+            width: 100%;
+        }
+
+        .footer-toggle {
+            width: 100%;
+            min-height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            color: inherit;
+            background: transparent;
+            border: 0;
+            cursor: pointer;
+            list-style: none;
+            text-align: left;
+        }
+
+        .footer-toggle::-webkit-details-marker {
+            display: none;
+        }
+
+        .footer-toggle:focus-visible {
+            outline: 2px solid #ffffff;
+            outline-offset: 2px;
+        }
+
+        .footer-toggle-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.6rem;
+            font-weight: 600;
+        }
+
+        .footer-toggle-label::after {
+            width: 7px;
+            height: 7px;
+            border-right: 2px solid currentColor;
+            border-bottom: 2px solid currentColor;
+            content: '';
+            transform: rotate(45deg);
+            transition: transform 120ms ease;
+        }
+
+        .footer-disclosure[open] .footer-toggle-label::after {
+            transform: rotate(225deg);
+        }
+
+        .footer-left {
+            font-weight: 600;
+        }
+
+        .footer-right {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 0.25rem;
+            padding: 0.25rem 0 0.4rem;
+            font-size: 0.85rem;
+        }
+
+        .footer-right[hidden] {
+            display: none;
+        }
+
+        .footer-disclosure:not([open]) > .footer-right {
+            display: none;
+        }
+
+        .contact-heading {
+            color: rgba(255,255,255,0.78);
+            font-size: 0.95rem;
+            font-weight: 600;
+        }
+
+        .contact-row {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .contact-text a {
+            color: #ffffff;
+            text-decoration: none;
+            font-weight: 400;
+        }
+
+        .contact-text a:hover,
+        .contact-text a:focus-visible {
+            text-decoration: underline;
+            text-underline-offset: 3px;
+        }
+
+        .contact-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            padding: 0;
+            border-radius: 0;
+            background: transparent;
+            text-decoration: none;
+            border-radius: 4px;
+            transition: background-color 120ms ease;
+        }
+
+        .contact-button:hover,
+        .contact-button:focus-visible {
+            background: rgba(255,255,255,0.16);
+        }
+
+        .contact-button:focus-visible,
+        .contact-text a:focus-visible {
+            outline: 2px solid #ffffff;
+            outline-offset: 2px;
+        }
+
+        .contact-button svg {
+            width: 18px;
+            height: 18px;
+            display: block;
+            fill: #ffffff;
+        }
+
+        .linkedin-short {
+            display: none;
+        }
+
+        @media (max-width: 420px) {
+            .linkedin-full {
+                display: none;
+            }
+
+            .linkedin-short {
+                display: inline;
+            }
+        }
+        
+        .section {
+            display: none;
+            padding: 2rem;
+        }
+
+        #timeline.section {
+            padding: 2rem 1rem 2rem 0;
+        }
+
+        /* Timeline layout */
+        .timeline-wrap {
+            display: flex;
+            gap: 26px;
+            align-items: stretch;
+            width: 100%;
+            max-width: none;
+            margin: 0;
+        }
+
+        .timeline-events {
+            flex: 1;
+            position: relative;
+            min-height: 520px;
+        }
+
+        .timeline-line {
+            width: 96px;
+            min-width: 96px;
+            position: relative;
+            height: 520px;
+        }
+
+        .tl-event { /* fallback styling for events */
+            box-shadow: 0 4px 12px rgba(11,22,26,0.04);
+            cursor: pointer;
+            touch-action: manipulation;
+        }
+
+        .tl-event:focus-visible {
+            outline: 3px solid #0F1B20;
+            outline-offset: 2px;
+        }
+
+        .timeline-dialog {
+            width: min(560px, calc(100vw - 2rem));
+            max-width: none;
+            border: 0;
+            border-radius: 10px;
+            padding: 1.5rem;
+            color: var(--text);
+            background: #fff;
+            box-shadow: 0 16px 48px rgba(15,27,32,0.24);
+        }
+
+        .timeline-dialog::backdrop {
+            background: rgba(15,27,32,0.5);
+        }
+
+        .timeline-dialog-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .timeline-dialog h2 {
+            font-size: 1.35rem;
+            overflow-wrap: anywhere;
+        }
+
+        .timeline-dialog-close {
+            flex: 0 0 auto;
+            padding: 0.45rem 0.7rem;
+            border: 2px solid #6B7A82;
+            border-radius: 6px;
+            color: var(--text);
+            background: #fff;
+            cursor: pointer;
+            transition: background-color 120ms ease, border-color 120ms ease, color 120ms ease;
+        }
+
+        .timeline-dialog-close:hover,
+        .timeline-dialog-close:focus-visible {
+            border-color: var(--nav);
+            color: #fff;
+            background: var(--nav);
+        }
+
+        .timeline-dialog-close:focus-visible {
+            outline: 2px solid var(--primary);
+            outline-offset: 2px;
+        }
+
+        .timeline-dialog-body:empty,
+        .timeline-dialog-subtitle:empty {
+            display: none;
+        }
+        
+        .section.active {
+            display: block;
+        }
+
+        @media (max-width: 900px) {
+            nav {
+                flex-wrap: wrap;
+            }
+
+            .nav-mobile-shortcuts {
+                display: flex;
+                flex: 1;
+                min-width: 0;
+                align-items: center;
+                gap: 0.25rem;
+                overflow: visible;
+            }
+
+            .nav-mobile-shortcuts > a,
+            .nav-category > summary {
+                display: flex;
+                flex: 0 0 auto;
+                align-items: center;
+                gap: 12px;
+                margin: 0;
+                padding: 0.25rem 0.2rem;
+                white-space: nowrap;
+                color: var(--text);
+                font-weight: 700;
+                text-decoration: none;
+                cursor: pointer;
+                border-radius: 8px;
+            }
+
+            .nav-mobile-shortcuts > a:hover,
+            .nav-mobile-shortcuts > a:focus-visible,
+            .nav-category > summary:hover,
+            .nav-category > summary:focus-visible {
+                background: rgba(60,163,214,0.12);
+                outline: none;
+            }
+
+            .nav-mobile-submenu {
+                position: absolute;
+                top: calc(100% + 0.5rem);
+                left: 0;
+                z-index: 1001;
+                display: flex;
+                min-width: max-content;
+                flex-direction: column;
+                gap: 0.25rem;
+                padding: 0.4rem;
+                border-radius: 8px;
+                background: #fff;
+                box-shadow: 0 6px 20px rgba(15,27,32,0.16);
+            }
+
+            .nav-mobile-submenu a {
+                display: block;
+                margin: 0;
+            }
+
+            .nav-mobile-shortcuts > [hidden] {
+                display: none;
+            }
+
+            .nav-toggle {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                gap: 5px;
+                margin-left: auto;
+            }
+
+            .nav-links {
+                display: none;
+                position: absolute;
+                top: calc(100% + 0.5rem);
+                right: 0;
+                z-index: 1001;
+                flex: 0 1 auto;
+                width: max-content;
+                max-width: calc(100vw - 2rem);
+                flex-direction: column;
+                align-items: flex-end;
+                justify-content: flex-end;
+                gap: 0.25rem;
+                margin: 0;
+                overflow: auto;
+                max-height: calc(100vh - 6rem);
+                padding: 0.4rem;
+                border-radius: 8px;
+                background: #fff;
+                box-shadow: 0 6px 20px rgba(15,27,32,0.16);
+            }
+
+            .nav-links > a {
+                text-align: right;
+            }
+
+            .nav-links > .nav-category {
+                align-self: flex-end;
+            }
+
+            .nav-links > .nav-category > summary {
+                justify-content: flex-end;
+            }
+
+            .nav-links > .nav-category .nav-desktop-submenu {
+                position: static;
+                min-width: 0;
+                align-items: flex-end;
+                padding: 0.1rem 1.4rem 0.4rem 0.4rem;
+                background: transparent;
+                box-shadow: none;
+            }
+
+            nav.is-open .nav-links {
+                display: flex;
+            }
+
+            nav a {
+                display: block;
+            }
+
+            nav a[hidden] {
+                display: none;
+            }
+        }
+
+        .model-viewer {
+            width: 100%;
+            height: 520px;
+            background: var(--viewer-bg);
+            border-radius: 12px;
+            display: block;
+            overflow: hidden; /* ensure rounded corners clip the model */
+            touch-action: none;
+        }
+
+        .model-viewer[hidden],
+        .quadruped-previews[hidden],
+        .quadruped-assembly-preview[hidden] {
+            display: none;
+        }
+
+        .model-viewer canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
+        .quadruped-previews .model-viewer {
+            height: auto;
+            aspect-ratio: 4 / 3;
+        }
+
+        .quadruped-showcase {
+            width: 100%;
+            margin-top: 1rem;
+        }
+
+        .quadruped-media {
+            position: relative;
+            width: 100%;
+        }
+
+        .quadruped-assembly-media {
+            width: fit-content;
+            max-width: 100%;
+        }
+
+        .quadruped-assembly-media > .quadruped-assembly-preview {
+            width: fit-content;
+            max-width: 100%;
+            margin: 0;
+        }
+
+        .quadruped-assembly-media > .model-viewer {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .quadruped-model-toggle {
+            position: absolute;
+            top: 0.75rem;
+            right: 0.75rem;
+            z-index: 2;
+        }
+
+        .quadruped-previews {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .quadruped-previews figure {
+            min-width: 0;
+        }
+
+        .quadruped-previews img {
+            display: block;
+            width: 100%;
+            aspect-ratio: 4 / 3;
+            object-fit: contain;
+            border-radius: 8px;
+            background: var(--viewer-bg);
+        }
+
+        .quadruped-previews img[hidden] {
+            display: none;
+        }
+
+        .quadruped-previews figcaption {
+            margin-top: 0.35rem;
+            color: var(--muted);
+            font-size: 0.85rem;
+        }
+
+        @media (max-width: 520px) {
+            .quadruped-previews {
+                gap: 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav aria-label="Main navigation">
+        <div class="nav-mobile-shortcuts" aria-label="Quick navigation">
+            <a onclick="showSection('home')">Home</a>
+            <details class="nav-category" data-sections="boston-dynamics,emcnei">
+                <summary>Work Experience</summary>
+                <div class="nav-mobile-submenu">
+                    <a onclick="showSection('boston-dynamics')">Boston Dynamics Co-op</a>
+                    <a onclick="showSection('emcnei')">EMCNEI Internship</a>
+                </div>
+            </details>
+            <details class="nav-category" data-sections="formula-sae,robotics-club">
+                <summary>Clubs</summary>
+                <div class="nav-mobile-submenu">
+                    <a onclick="showSection('formula-sae')">Formula SAE</a>
+                    <a onclick="showSection('robotics-club')">UMass Robotics Club</a>
+                </div>
+            </details>
+        </div>
+        <button class="nav-toggle" type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="primary-nav">
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+        </button>
+        <div class="nav-links" id="primary-nav">
+            <a onclick="showSection('home')">Home</a>
+            <details class="nav-category" data-sections="boston-dynamics,emcnei">
+                <summary>Work Experience</summary>
+                <div class="nav-desktop-submenu">
+                    <a onclick="showSection('boston-dynamics')">Boston Dynamics Co-op</a>
+                    <a onclick="showSection('emcnei')">EMCNEI Internship</a>
+                </div>
+            </details>
+            <details class="nav-category" data-sections="formula-sae,robotics-club">
+                <summary>Clubs</summary>
+                <div class="nav-desktop-submenu">
+                    <a onclick="showSection('formula-sae')">Formula SAE</a>
+                    <a onclick="showSection('robotics-club')">UMass Robotics Club</a>
+                </div>
+            </details>
+            <a onclick="showSection('skills')">Skills</a>
+            <a onclick="showSection('timeline')">Timeline</a>
+        </div>
+    </nav>
+
+    <div id="home" class="section active">
+        <div class="header">
+            <div class="header-left">
+                <p class="subtitle">Placeholder subtitle</p>
+                <h1>Your Name Here</h1>
+                <div class="cta-buttons">
+                    <button class="cta-button primary" onclick="showSection('boston-dynamics')">Current Position</button>
+                </div>
+            </div>
+            <img src="your-image.jpg" alt="Profile Picture">
+        </div>
+    </div>
+
+    <div id="boston-dynamics" class="section">
+        <h2>Boston Dynamics Co-op</h2>
+        <p>Your Boston Dynamics Co-op projects and experience here</p>
+    </div>
+
+    <div id="formula-sae" class="section">
+        <h2>Formula SAE</h2>
+        <div class="club-project-list">
+            <article class="club-project">
+                <header>
+                    <h3>Project Title</h3>
+                    <p>My Title / role</p>
+                </header>
+                <p>Project overview</p>
+                <div>Project pictures / 3D model</div>
+                <div class="club-subprojects">
+                    <article class="club-subproject">
+                        <h4>Subproject / Assembly Title</h4>
+                        <p>Subproject overview</p>
+                        <div>Subproject pictures / 3D model</div>
+                    </article>
+                </div>
+            </article>
+        </div>
+    </div>
+
+    <div id="robotics-club" class="section">
+        <h2>UMass Robotics Club</h2>
+        <div class="club-project-list">
+            <article class="club-project">
+                <header>
+                    <h3>Project Title</h3>
+                    <p>My Title / role</p>
+                </header>
+                <p>Project overview</p>
+                <div class="quadruped-showcase">
+                    <div class="quadruped-media quadruped-assembly-media">
+                        <figure id="quadruped-assembly-preview" style="width:fit-content;max-width:100%;margin:0;overflow:hidden;border-radius:16px">
+                            <img src="elements/images/Full%20Quadruped%20Raising%20Arm.png" alt="Full quadruped raising arm assembly" style="display:block;width:auto;max-width:100%;max-height:620px;object-fit:contain;border-radius:inherit;clip-path:inset(0 round 16px)">
+                        </figure>
+                        <div id="assembly-model-viewer" class="model-viewer" role="group" aria-label="Interactive full quadruped assembly model" tabindex="0" data-model-src="elements/models/Quadruped%20Full%20Assembly.glb" hidden></div>
+                        <button class="cta-button primary quadruped-model-toggle" id="assembly-model-toggle" type="button" aria-expanded="false">Show 3D model</button>
+                    </div>
+                    <p id="assembly-model-status" role="status" style="margin-top:.5rem;color:var(--muted)" hidden>Loading full assembly model...</p>
+                </div>
+                <div class="club-subprojects">
+                    <article class="club-subproject">
+                        <h4>Quadruped Leg</h4>
+                        <p>Subproject overview</p>
+                        <div class="quadruped-showcase">
+                            <div class="quadruped-media">
+                                <div class="quadruped-previews" id="quadruped-previews">
+                                    <figure>
+                                        <img id="quadruped-preview-side" alt="Quadruped leg, side view" />
+                                        <figcaption>Side view</figcaption>
+                                    </figure>
+                                    <figure>
+                                        <img id="quadruped-preview-opposite" alt="Quadruped leg, opposite side view" />
+                                        <div id="model-viewer" class="model-viewer" role="group" aria-label="Interactive quadruped leg model" tabindex="0" data-model-src="elements/models/test-model.glb" hidden></div>
+                                        <figcaption>Opposite side</figcaption>
+                                    </figure>
+                                </div>
+                                <button class="cta-button primary quadruped-model-toggle" id="quadruped-model-toggle" type="button" aria-expanded="false" disabled>Show 3D model</button>
+                            </div>
+                            <p id="model-viewer-status" role="status" style="margin-top:.5rem;color:var(--muted)">Preparing model views...</p>
+                        </div>
+                    </article>
+                </div>
+            </article>
+        </div>
+    </div>
+
+    <div id="emcnei" class="section">
+        <h2>EMCNEI Internship</h2>
+        <p>Your EMCNEI Internship projects and contributions here</p>
+    </div>
+
+    <style>
+        /* Portrait / small screens: make profile image a rounded rectangle */
+        @media (max-width: 600px) {
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .header img {
+                width: 120px;
+                height: 160px;
+                border-radius: 18px; /* rounded rectangle */
+                margin-top: 12px;
+            }
+        }
+    </style>
+
+    <div id="skills" class="section">
+        <h2>Skills</h2>
+        <p>Your skills content here</p>
+    </div>
+
+    <div id="timeline" class="section">
+        <div class="timeline-wrap">
+            <div class="timeline-line" id="timeline-line"></div>
+            <div class="timeline-events" id="timeline-events"></div>
+        </div>
+        <p style="margin-top:.5rem;color:var(--muted)">Seasons shown between years; events auto-layout when overlapping.</p>
+        <dialog class="timeline-dialog" id="timeline-event-dialog" aria-labelledby="timeline-event-title">
+            <div class="timeline-dialog-header">
+                <div>
+                    <h2 id="timeline-event-title"></h2>
+                </div>
+                <button class="timeline-dialog-close" type="button" aria-label="Close event details">Close</button>
+            </div>
+            <p class="timeline-dialog-subtitle" id="timeline-event-subtitle"></p>
+            <p class="timeline-dialog-body" id="timeline-event-body"></p>
+        </dialog>
+    </div>
+
+    <footer class="site-footer">
+        <details class="footer-disclosure" id="contact-disclosure">
+            <summary class="footer-toggle">
+                <span class="footer-left">Your Name Here</span>
+                <span class="footer-toggle-label">Contact info</span>
+            </summary>
+            <div class="footer-right">
+            <div class="contact-row">
+                <a class="contact-button" href="mailto:you@example.com" aria-label="Email">
+                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4-8 5-8-5V6l8 5 8-5v2z"/></svg>
+                </a>
+                <div class="contact-text"><a href="mailto:you@example.com">you@example.com</a></div>
+            </div>
+            <div class="contact-row">
+                <a class="contact-button" href="tel:+1234567890" aria-label="Call">
+                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M6.6 10.8c1.2 2.3 3 4.1 5.3 5.3l1.6-1.6c.2-.2.5-.3.8-.2 1 .3 2 .5 3 .5.4 0 .8.3.8.7V20c0 .4-.3.8-.7.8-9.9 0-18-8.1-18-18 0-.4.4-.7.8-.7h3.4c.4 0 .7.3.7.8 0 1 .2 2 .5 3 .1.3 0 .6-.2.8L6.6 10.8z"/></svg>
+                </a>
+                <div class="contact-text"><a href="tel:+1234567890">+1 (234) 567-890</a></div>
+            </div>
+            <div class="contact-row">
+                <a class="contact-button" href="https://www.linkedin.com/in/marco-vital" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn profile">
+                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.35V9h3.414v1.561h.049c.476-.9 1.637-1.85 3.37-1.85 3.601 0 4.268 2.37 4.268 5.455v6.286ZM5.337 7.433a2.062 2.062 0 1 1 0-4.124 2.062 2.062 0 0 1 0 4.124ZM7.119 20.452H3.554V9h3.565v11.452ZM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0z"/></svg>
+                </a>
+                <div class="contact-text"><a href="https://www.linkedin.com/in/marco-vital" target="_blank" rel="noopener noreferrer"><span class="linkedin-full">linkedin.com/in/marco-vital</span><span class="linkedin-short">linkedin.com</span></a></div>
+            </div>
+            </div>
+        </details>
+    </footer>
+    <div class="page-scrollbar" id="page-scrollbar" role="scrollbar" aria-label="Page scroll position" aria-orientation="vertical" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" tabindex="0" hidden>
+        <button class="page-scrollbar-control page-scrollbar-up" type="button" aria-label="Scroll up"></button>
+        <div class="page-scrollbar-thumb" id="page-scrollbar-thumb"></div>
+        <button class="page-scrollbar-control page-scrollbar-down" type="button" aria-label="Scroll down"></button>
+    </div>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+        import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+
+        const container = document.getElementById('model-viewer');
+        const status = document.getElementById('model-viewer-status');
+        const previewGallery = document.getElementById('quadruped-previews');
+        const previewImages = [
+            { image: document.getElementById('quadruped-preview-side'), x: 0.65, z: 0.65 },
+            { image: document.getElementById('quadruped-preview-opposite'), x: -0.65, z: 0.65 }
+        ];
+        const oppositePreviewImage = document.getElementById('quadruped-preview-opposite');
+        const modelToggle = document.getElementById('quadruped-model-toggle');
+        const fullAssemblyContainer = document.getElementById('assembly-model-viewer');
+        const fullAssemblyStatus = document.getElementById('assembly-model-status');
+        const fullAssemblyPreview = document.getElementById('quadruped-assembly-preview');
+        const fullAssemblyToggle = document.getElementById('assembly-model-toggle');
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(35, 1, 0.01, 1000);
+        const pixelRatio = Math.min(window.devicePixelRatio, 2);
+        const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
+        renderer.setPixelRatio(pixelRatio);
+        renderer.outputColorSpace = THREE.SRGBColorSpace;
+        renderer.setClearColor(0xe6ebef);
+        container.appendChild(renderer.domElement);
+
+        scene.add(new THREE.HemisphereLight(0xffffff, 0x68747a, 1.5));
+        const keyLight = new THREE.DirectionalLight(0xffffff, 2);
+        keyLight.position.set(-4, 6, -5);
+        scene.add(keyLight);
+
+        const controls = new OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.autoRotate = true;
+        controls.autoRotateSpeed = 1;
+
+        const fullAssemblyScene = new THREE.Scene();
+        const fullAssemblyCamera = new THREE.PerspectiveCamera(35, 1, 0.01, 1000);
+        const fullAssemblyRenderer = new THREE.WebGLRenderer({ antialias: true });
+        fullAssemblyRenderer.setPixelRatio(Math.min(pixelRatio, 1.25));
+        fullAssemblyRenderer.outputColorSpace = THREE.SRGBColorSpace;
+        fullAssemblyRenderer.setClearColor(0xe6ebef);
+        fullAssemblyContainer.appendChild(fullAssemblyRenderer.domElement);
+        fullAssemblyScene.add(new THREE.HemisphereLight(0xffffff, 0x68747a, 1.5));
+        const fullAssemblyKeyLight = new THREE.DirectionalLight(0xffffff, 2);
+        fullAssemblyKeyLight.position.set(-4, 6, -5);
+        fullAssemblyScene.add(fullAssemblyKeyLight);
+
+        const fullAssemblyControls = new OrbitControls(fullAssemblyCamera, fullAssemblyRenderer.domElement);
+        fullAssemblyControls.enableDamping = false;
+        fullAssemblyControls.autoRotate = false;
+        let fullAssemblyRenderFrame = null;
+        let fullAssemblyLoaded = false;
+        let fullAssemblyLoading = false;
+
+        function resizeViewer() {
+            const width = container.clientWidth;
+            const height = container.clientHeight;
+            if (!width || !height) return;
+            renderer.setSize(width, height, false);
+            camera.aspect = width / height;
+            camera.updateProjectionMatrix();
+        }
+
+        function resizeFullAssemblyViewer() {
+            const width = fullAssemblyContainer.clientWidth;
+            const height = fullAssemblyContainer.clientHeight;
+            if (!width || !height) return;
+            fullAssemblyRenderer.setSize(width, height, false);
+            fullAssemblyCamera.aspect = width / height;
+            fullAssemblyCamera.updateProjectionMatrix();
+            renderFullAssembly();
+        }
+
+        function closeLegModel() {
+            container.hidden = true;
+            oppositePreviewImage.hidden = false;
+            modelToggle.setAttribute('aria-expanded', 'false');
+            modelToggle.textContent = 'Show 3D model';
+        }
+
+        function stopFullAssemblyRendering() {
+            if (fullAssemblyRenderFrame !== null) {
+                cancelAnimationFrame(fullAssemblyRenderFrame);
+                fullAssemblyRenderFrame = null;
+            }
+        }
+
+        function closeFullAssemblyModel() {
+            fullAssemblyContainer.hidden = true;
+            fullAssemblyPreview.querySelector('img').style.visibility = 'visible';
+            fullAssemblyToggle.setAttribute('aria-expanded', 'false');
+            fullAssemblyToggle.textContent = 'Show 3D model';
+            stopFullAssemblyRendering();
+        }
+
+        function renderFullAssembly() {
+            if (fullAssemblyContainer.hidden || fullAssemblyRenderFrame !== null) return;
+            fullAssemblyRenderFrame = requestAnimationFrame(() => {
+                fullAssemblyRenderFrame = null;
+                if (!fullAssemblyContainer.hidden) fullAssemblyRenderer.render(fullAssemblyScene, fullAssemblyCamera);
+            });
+        }
+        fullAssemblyControls.addEventListener('change', renderFullAssembly);
+
+        new ResizeObserver(resizeViewer).observe(container);
+        new ResizeObserver(resizeFullAssemblyViewer).observe(fullAssemblyContainer);
+        window.addEventListener('resize', resizeViewer);
+        window.addEventListener('resize', resizeFullAssemblyViewer);
+
+        modelToggle.addEventListener('click', () => {
+            const showModel = container.hidden;
+            if (showModel) closeFullAssemblyModel();
+            container.hidden = !showModel;
+            oppositePreviewImage.hidden = showModel;
+            modelToggle.setAttribute('aria-expanded', String(showModel));
+            modelToggle.textContent = showModel ? 'Show pictures' : 'Show 3D model';
+            if (showModel) requestAnimationFrame(resizeViewer);
+        });
+
+        fullAssemblyToggle.addEventListener('click', () => {
+            const showModel = fullAssemblyContainer.hidden;
+            if (showModel) {
+                closeLegModel();
+                fullAssemblyContainer.hidden = false;
+                fullAssemblyPreview.querySelector('img').style.visibility = 'hidden';
+                fullAssemblyToggle.setAttribute('aria-expanded', 'true');
+                fullAssemblyToggle.textContent = 'Show image';
+                fullAssemblyStatus.hidden = fullAssemblyLoaded;
+                if (!fullAssemblyLoaded && !fullAssemblyLoading) loadFullAssemblyModel();
+                requestAnimationFrame(() => {
+                    resizeFullAssemblyViewer();
+                    if (fullAssemblyLoaded && fullAssemblyRenderFrame === null) renderFullAssembly();
+                });
+            } else {
+                closeFullAssemblyModel();
+            }
+        });
+
+        new GLTFLoader().load(
+            container.dataset.modelSrc,
+            ({ scene: model }) => {
+                const bounds = new THREE.Box3().setFromObject(model);
+                const center = bounds.getCenter(new THREE.Vector3());
+                const size = bounds.getSize(new THREE.Vector3());
+                const radius = Math.max(size.length() / 2, 0.01);
+                model.position.sub(center);
+
+                const edgeMaterial = new THREE.LineBasicMaterial({
+                    color: 0x263238,
+                    transparent: true,
+                    opacity: 0.85,
+                    depthWrite: false,
+                    toneMapped: false
+                });
+
+                model.traverse((object) => {
+                    if (!object.isMesh) return;
+                    const edges = new THREE.EdgesGeometry(object.geometry, 30);
+                    const lines = new THREE.LineSegments(edges, edgeMaterial);
+                    lines.renderOrder = 1;
+                    object.add(lines);
+                });
+
+                scene.add(model);
+                const distance = radius / Math.sin(THREE.MathUtils.degToRad(camera.fov / 2)) * 1.2;
+                camera.position.set(distance * 0.65, distance * 0.45, distance * 0.65);
+                camera.near = radius / 100;
+                camera.far = radius * 100;
+                camera.updateProjectionMatrix();
+                controls.target.set(0, 0, 0);
+                controls.update();
+
+                controls.autoRotate = false;
+                renderer.setPixelRatio(1);
+                renderer.setSize(640, 480, false);
+                camera.aspect = 4 / 3;
+                previewImages.forEach(({ image, x, z }) => {
+                    camera.position.set(distance * x, distance * 0.45, distance * z);
+                    camera.lookAt(0, 0, 0);
+                    camera.updateProjectionMatrix();
+                    renderer.render(scene, camera);
+                    image.src = renderer.domElement.toDataURL('image/png');
+                });
+
+                camera.position.set(distance * 0.65, distance * 0.45, distance * 0.65);
+                camera.lookAt(0, 0, 0);
+                camera.aspect = 1;
+                camera.updateProjectionMatrix();
+                renderer.setPixelRatio(pixelRatio);
+                controls.autoRotate = true;
+                controls.update();
+                status.hidden = true;
+                modelToggle.disabled = false;
+                resizeViewer();
+            },
+            undefined,
+            () => {
+                status.textContent = 'Unable to load the 3D model.';
+                modelLoadStatus.textContent = 'Unable to load the 3D model.';
+            }
+        );
+
+        function loadFullAssemblyModel() {
+            fullAssemblyLoading = true;
+            fullAssemblyStatus.hidden = false;
+            fullAssemblyStatus.textContent = 'Loading full assembly model...';
+            new GLTFLoader().load(
+                fullAssemblyContainer.dataset.modelSrc,
+                ({ scene: model }) => {
+                const bounds = new THREE.Box3().setFromObject(model);
+                const center = bounds.getCenter(new THREE.Vector3());
+                const size = bounds.getSize(new THREE.Vector3());
+                const radius = Math.max(size.length() / 2, 0.01);
+                model.position.sub(center);
+
+                const edgeMaterial = new THREE.LineBasicMaterial({
+                    color: 0x263238,
+                    transparent: true,
+                    opacity: 0.85,
+                    depthWrite: false,
+                    toneMapped: false
+                });
+
+                model.traverse((object) => {
+                    if (!object.isMesh) return;
+                    const vertexCount = object.geometry.attributes.position?.count ?? 0;
+                    if (vertexCount > 10000) return;
+                    const edges = new THREE.EdgesGeometry(object.geometry, 30);
+                    const lines = new THREE.LineSegments(edges, edgeMaterial);
+                    lines.renderOrder = 1;
+                    object.add(lines);
+                });
+
+                const orientedModel = new THREE.Group();
+                orientedModel.rotation.x = 3 * Math.PI / 2;
+                orientedModel.rotation.z = Math.PI;
+                orientedModel.add(model);
+                fullAssemblyScene.add(orientedModel);
+                const distance = radius / Math.sin(THREE.MathUtils.degToRad(fullAssemblyCamera.fov / 2)) * 0.6;
+                fullAssemblyCamera.position.set(distance * 0.65, distance * 0.45, distance * 0.65);
+                fullAssemblyCamera.near = radius / 100;
+                fullAssemblyCamera.far = radius * 100;
+                fullAssemblyCamera.updateProjectionMatrix();
+                fullAssemblyControls.target.set(0, 0, 0);
+                fullAssemblyControls.update();
+                fullAssemblyLoaded = true;
+                fullAssemblyLoading = false;
+                fullAssemblyStatus.hidden = true;
+                if (!fullAssemblyContainer.hidden) {
+                    resizeFullAssemblyViewer();
+                    if (fullAssemblyRenderFrame === null) renderFullAssembly();
+                }
+                },
+                undefined,
+                () => {
+                    fullAssemblyLoading = false;
+                    fullAssemblyStatus.hidden = false;
+                    fullAssemblyStatus.textContent = 'Unable to load the full assembly model.';
+                    fullAssemblyContainer.hidden = true;
+                    fullAssemblyPreview.hidden = false;
+                    fullAssemblyToggle.setAttribute('aria-expanded', 'false');
+                    fullAssemblyToggle.textContent = 'Try 3D model again';
+                    stopFullAssemblyRendering();
+                }
+            );
+        }
+
+        function render() {
+            requestAnimationFrame(render);
+            controls.update();
+            renderer.render(scene, camera);
+        }
+        render();
+    </script>
+
+    <script>
+        const mainNav = document.querySelector('nav');
+        const navToggle = mainNav.querySelector('.nav-toggle');
+        const contactDisclosure = document.getElementById('contact-disclosure');
+        const pageScrollbar = document.getElementById('page-scrollbar');
+        const pageScrollbarThumb = document.getElementById('page-scrollbar-thumb');
+        const pageScrollbarUp = pageScrollbar.querySelector('.page-scrollbar-up');
+        const pageScrollbarDown = pageScrollbar.querySelector('.page-scrollbar-down');
+        const pageScrollbarArrowSize = 16;
+        let scrollbarDragStart = null;
+        let scrollStart = 0;
+
+        function updatePageScrollbar() {
+            const footerHeight = document.querySelector('.site-footer').getBoundingClientRect().height;
+            pageScrollbar.style.bottom = `${footerHeight}px`;
+
+            const documentHeight = Math.max(document.documentElement.scrollHeight, document.body.scrollHeight);
+            const viewportHeight = window.innerHeight;
+            const maxScroll = documentHeight - viewportHeight;
+            pageScrollbar.hidden = maxScroll <= 1;
+            if (pageScrollbar.hidden) return;
+
+            const scrollTrackHeight = Math.max(0, pageScrollbar.clientHeight - pageScrollbarArrowSize * 2);
+            const thumbHeight = Math.min(scrollTrackHeight, Math.max(28, scrollTrackHeight * viewportHeight / documentHeight));
+            const thumbRange = Math.max(0, scrollTrackHeight - thumbHeight);
+            const scrollPercent = Math.min(1, Math.max(0, window.scrollY / maxScroll));
+            pageScrollbarThumb.style.height = `${thumbHeight}px`;
+            pageScrollbarThumb.style.transform = `translateY(${pageScrollbarArrowSize + thumbRange * scrollPercent}px)`;
+            pageScrollbar.setAttribute('aria-valuenow', String(Math.round(scrollPercent * 100)));
+            pageScrollbarUp.disabled = scrollPercent <= 0;
+            pageScrollbarDown.disabled = scrollPercent >= 1;
+        }
+
+        function scrollToScrollbarPosition(clientY) {
+            const track = pageScrollbar.getBoundingClientRect();
+            const thumbHeight = pageScrollbarThumb.getBoundingClientRect().height;
+            const scrollTrackHeight = track.height - pageScrollbarArrowSize * 2;
+            const thumbRange = Math.max(1, scrollTrackHeight - thumbHeight);
+            const thumbTop = Math.min(thumbRange, Math.max(0, clientY - track.top - pageScrollbarArrowSize - thumbHeight / 2));
+            const documentHeight = Math.max(document.documentElement.scrollHeight, document.body.scrollHeight);
+            const maxScroll = documentHeight - window.innerHeight;
+            window.scrollTo(0, maxScroll * thumbTop / thumbRange);
+        }
+
+        pageScrollbar.addEventListener('pointerdown', event => {
+            if (event.target.closest('.page-scrollbar-control')) return;
+            event.preventDefault();
+            if (event.target === pageScrollbarThumb) {
+                scrollbarDragStart = event.clientY;
+                scrollStart = window.scrollY;
+                pageScrollbar.setPointerCapture(event.pointerId);
+            } else {
+                scrollToScrollbarPosition(event.clientY);
+            }
+        });
+
+        pageScrollbar.addEventListener('pointermove', event => {
+            if (scrollbarDragStart === null) return;
+            const trackHeight = pageScrollbar.clientHeight;
+            const thumbHeight = pageScrollbarThumb.getBoundingClientRect().height;
+            const scrollTrackHeight = trackHeight - pageScrollbarArrowSize * 2;
+            const thumbRange = Math.max(1, scrollTrackHeight - thumbHeight);
+            const documentHeight = Math.max(document.documentElement.scrollHeight, document.body.scrollHeight);
+            const maxScroll = documentHeight - window.innerHeight;
+            window.scrollTo(0, scrollStart + (event.clientY - scrollbarDragStart) * maxScroll / thumbRange);
+        });
+
+        pageScrollbarUp.addEventListener('click', () => window.scrollBy({top: -100, behavior: 'smooth'}));
+        pageScrollbarDown.addEventListener('click', () => window.scrollBy({top: 100, behavior: 'smooth'}));
+
+        function stopScrollbarDrag() {
+            scrollbarDragStart = null;
+        }
+
+        pageScrollbar.addEventListener('pointerup', stopScrollbarDrag);
+        pageScrollbar.addEventListener('pointercancel', stopScrollbarDrag);
+        pageScrollbar.addEventListener('keydown', event => {
+            const scrollAmount = event.key === 'PageDown' || event.key === 'PageUp' ? window.innerHeight * 0.9 : 40;
+            if (event.key === 'ArrowDown' || event.key === 'PageDown') window.scrollBy(0, scrollAmount);
+            else if (event.key === 'ArrowUp' || event.key === 'PageUp') window.scrollBy(0, -scrollAmount);
+            else if (event.key === 'Home') window.scrollTo(0, 0);
+            else if (event.key === 'End') window.scrollTo(0, document.documentElement.scrollHeight);
+            else return;
+            event.preventDefault();
+        });
+
+        window.addEventListener('scroll', updatePageScrollbar, {passive: true});
+        window.addEventListener('resize', updatePageScrollbar);
+        new ResizeObserver(updatePageScrollbar).observe(document.body);
+        new ResizeObserver(updatePageScrollbar).observe(document.querySelector('.site-footer'));
+        updatePageScrollbar();
+
+        contactDisclosure.addEventListener('toggle', () => {
+            document.body.classList.toggle('contact-info-open', contactDisclosure.open);
+            requestAnimationFrame(updatePageScrollbar);
+        });
+
+        const allCategories = [...mainNav.querySelectorAll('.nav-category')];
+        const desktopCategories = [...mainNav.querySelectorAll('.nav-links > .nav-category')];
+
+        allCategories.forEach(category => {
+            category.querySelector('summary').addEventListener('click', () => {
+                if (category.open) return;
+                const categoriesToClose = window.matchMedia('(max-width: 900px)').matches ? allCategories : desktopCategories;
+                categoriesToClose.forEach(other => {
+                    if (other !== category) other.open = false;
+                });
+            });
+        });
+
+        function closeNavigation() {
+            mainNav.classList.remove('is-open');
+            navToggle.setAttribute('aria-expanded', 'false');
+            navToggle.setAttribute('aria-label', 'Open navigation');
+            mainNav.querySelectorAll('.nav-category[open]').forEach(group => { group.open = false; });
+        }
+
+        function fitMobileNavigation() {
+            const isMobile = window.matchMedia('(max-width: 900px)').matches;
+            const shortcutBar = mainNav.querySelector('.nav-mobile-shortcuts');
+            const shortcuts = [...shortcutBar.children];
+            const fullItems = [...mainNav.querySelector('.nav-links').children];
+            const visibleSections = new Set();
+            const availableWidth = shortcutBar.clientWidth;
+            const gap = parseFloat(getComputedStyle(shortcutBar).gap) || 0;
+            let usedWidth = 0;
+            let priorityOverflow = false;
+
+            shortcuts.forEach((link, index) => {
+                link.hidden = false;
+                if (!isMobile) return;
+                const nextWidth = usedWidth + (usedWidth ? gap : 0) + link.getBoundingClientRect().width;
+                const fits = index === 0 || (!priorityOverflow && nextWidth <= availableWidth);
+                link.hidden = !fits;
+                if (fits) {
+                    usedWidth = nextWidth;
+                    const sections = link.dataset.sections?.split(',') || [link.getAttribute('onclick').match(/showSection\('([^']+)'\)/)[1]];
+                    sections.forEach(section => visibleSections.add(section));
+                } else {
+                    priorityOverflow = true;
+                }
+            });
+
+            fullItems.forEach(item => {
+                const sections = item.dataset.sections?.split(',') || [item.getAttribute('onclick').match(/showSection\('([^']+)'\)/)[1]];
+                item.hidden = isMobile && sections.every(section => visibleSections.has(section));
+            });
+        }
+
+        window.addEventListener('resize', fitMobileNavigation);
+        fitMobileNavigation();
+
+        navToggle.addEventListener('click', () => {
+            const isOpen = mainNav.classList.toggle('is-open');
+            navToggle.setAttribute('aria-expanded', String(isOpen));
+            navToggle.setAttribute('aria-label', isOpen ? 'Close navigation' : 'Open navigation');
+            if (isOpen) {
+                mainNav.querySelectorAll('.nav-mobile-shortcuts .nav-category[open]').forEach(category => { category.open = false; });
+            }
+        });
+
+        document.addEventListener('keydown', event => {
+            if (event.key === 'Escape' && mainNav.classList.contains('is-open')) {
+                closeNavigation();
+                navToggle.focus();
+            }
+        });
+
+        function showSection(sectionId) {
+            const sections = document.querySelectorAll('.section');
+            sections.forEach(section => section.classList.remove('active'));
+            document.getElementById(sectionId).classList.add('active');
+            closeNavigation();
+            if (sectionId === 'timeline') window.renderTimeline?.();
+        }
+        
+        /* Timeline implementation
+         - Add events with addTimelineEvent({start:{year,season}, end:{year,season}, title, subtitle, body, color})
+         - Seasons: ['Spring','Summer','Fall','Winter']
+         - Years displayed: 2026 down to 2022 (configurable)
+        */
+        (function(){
+            const seasons = ['Spring','Summer','Fall','Winter'];
+            const minYear = 2022, maxYear = 2026; // inclusive
+            const unitsPerYear = seasons.length; // 4
+            const totalUnits = (maxYear - minYear + 1) * unitsPerYear;
+
+            const events = [];
+            const timelineTemplates = {
+                robotics: { label: 'Robotics', color: '#FF9500' },
+                fsae: { label: 'FSAE', color: '#D8C09A' },
+                cardinalCoders: { label: 'Cardinal Coders', color: '#C41E3A' },
+                umass: { label: 'UMass', color: '#881C1C' },
+                bostonDynamics: { label: 'Boston Dynamics', color: '#0077B5' }
+            };
+
+            function seasonIndex(season){
+                const i = seasons.findIndex(s => s.toLowerCase() === season.toLowerCase());
+                return i >= 0 ? i : 0;
+            }
+
+            function toUnit(year, season){
+                return (year - minYear) * unitsPerYear + seasonIndex(season);
+            }
+
+            function darker(hex, amt){
+                // simple hex darken by amount (0-1)
+                const c = hex.replace('#','');
+                const num = parseInt(c,16);
+                let r = (num>>16) & 0xFF; r = Math.max(0, Math.floor(r*(1-amt)));
+                let g = (num>>8) & 0xFF; g = Math.max(0, Math.floor(g*(1-amt)));
+                let b = num & 0xFF; b = Math.max(0, Math.floor(b*(1-amt)));
+                return '#'+[r,g,b].map(x=>x.toString(16).padStart(2,'0')).join('');
+            }
+
+            function hexToRgba(hex, alpha){
+                if(!hex) return `rgba(7,35,43,${alpha})`;
+                const c = hex.replace('#','');
+                const num = parseInt(c,16);
+                let r = (num>>16) & 0xFF;
+                let g = (num>>8) & 0xFF;
+                let b = num & 0xFF;
+                return `rgba(${r},${g},${b},${alpha})`;
+            }
+
+            function mixWithGray(hex, mix, alpha){
+                // mix: 0..1 where 1 => full gray, 0 => original
+                const gray = 235; // light gray base
+                if(!hex) return `rgba(${gray},${gray},${gray},${alpha})`;
+                const c = hex.replace('#','');
+                const num = parseInt(c,16);
+                let r = (num>>16) & 0xFF;
+                let g = (num>>8) & 0xFF;
+                let b = num & 0xFF;
+                const mr = Math.round(gray*mix + r*(1-mix));
+                const mg = Math.round(gray*mix + g*(1-mix));
+                const mb = Math.round(gray*mix + b*(1-mix));
+                return `rgba(${mr},${mg},${mb},${alpha})`;
+            }
+
+            function buildYearLine(){
+                    const line = document.getElementById('timeline-line');
+                    line.innerHTML = '';
+                    line.style.position = 'relative';
+                    // ensure line height matches events container
+                    const eventsContainer = document.getElementById('timeline-events');
+                    const containerHeight = eventsContainer.clientHeight || 520;
+                    line.style.height = containerHeight + 'px';
+                    // vertical main line (drawn inside line area)
+                    const main = document.createElement('div');
+                    main.style.position = 'absolute';
+                    main.style.left = '50%';
+                    main.style.transform = 'translateX(-50%)';
+                    main.style.top = '0';
+                    main.style.height = '100%';
+                    main.style.width = '3px';
+                    main.style.background = 'rgba(15,27,32,0.12)';
+                    line.appendChild(main);
+
+                    // ticks and labels: compute positions in px so they align with event container
+                        // choose a unit pixel height so timeline is tall and scrollable
+                        const unitPx = 140; // px per season unit (adjust for more/less vertical space)
+                        const desiredHeight = totalUnits * unitPx;
+                        const finalHeight = Math.max(containerHeight, desiredHeight);
+                        line.style.height = finalHeight + 'px';
+                        // recompute unitHeight based on finalHeight
+                        const unitHeight = finalHeight / totalUnits;
+
+                        for(let y=maxYear; y>=minYear; y--){
+                            // place year label slightly above the Winter season label (Winter is last season)
+                            const winterIndex = (y - minYear) * unitsPerYear + (unitsPerYear - 1);
+                            const winterPosPx = Math.round((totalUnits - winterIndex - 0.5) * unitHeight);
+                            // position year a bit above winter proportional to winter unit height
+                            const yearPosPx = winterPosPx - Math.round(unitHeight * 0.35);
+                            const label = document.createElement('div');
+                            label.style.position = 'absolute';
+                            label.style.left = 'calc(50% + 4px)';
+                            label.style.top = (yearPosPx - 10) + 'px';
+                            label.style.fontSize = '0.95rem';
+                            label.style.fontWeight = '700';
+                            label.style.color = '#000000';
+                            label.textContent = y;
+                            line.appendChild(label);
+                            // seasons positioned at their unit points (slightly indented)
+                            for(let s=0;s<seasons.length;s++){
+                                const unitIndex = (y - minYear) * unitsPerYear + s;
+                                const posPx = Math.round((totalUnits - unitIndex - 0.5) * unitHeight);
+                                const small = document.createElement('div');
+                                small.style.position = 'absolute';
+                                small.style.left = 'calc(50% + 4px)';
+                                small.style.top = (posPx - 8) + 'px';
+                                small.style.fontSize = '0.75rem';
+                                small.style.color = 'var(--muted)';
+                                small.textContent = seasons[s];
+                                line.appendChild(small);
+                            }
+                        }
+            }
+
+            function assignTimelineLanes(){
+                const lanes = [];
+                const ordered = events.slice().sort((a,b) => a.priority - b.priority || a.start - b.start || a.order - b.order);
+
+                ordered.forEach(event => {
+                    let lane = lanes.findIndex(items => items.every(item => item.end <= event.start || event.end <= item.start));
+                    if(lane === -1){
+                        lane = lanes.length;
+                        lanes.push([]);
+                    }
+                    lanes[lane].push(event);
+                    event._lane = lane;
+                });
+
+                events.forEach(event => event._columns = lanes.length || 1);
+            }
+
+            function layoutEvents(){
+                const container = document.getElementById('timeline-events');
+                container.innerHTML = '';
+                container.style.position = 'relative';
+                // ensure tall timeline so users must scroll
+                const unitPx = 140;
+                const desiredHeight = totalUnits * unitPx;
+                container.style.minHeight = desiredHeight + 'px';
+                const containerHeight = Math.max(container.clientHeight || 520, desiredHeight);
+
+                    assignTimelineLanes();
+
+                    // render all events using per-event columns/lane
+                    for(let i=0;i<events.length;i++){
+                        const ev = events[i];
+                        const el = document.createElement('div');
+                        el.className = 'tl-event';
+                        el.style.position = 'absolute';
+                        // map units to pixel coordinates (timeline runs newest at top)
+                        const topPx = Math.round(((totalUnits - ev.end) / totalUnits) * containerHeight);
+                        const heightPx = Math.max(28, Math.round(((ev.end - ev.start) / totalUnits) * containerHeight));
+                        el.style.top = topPx + 'px';
+                        el.style.height = heightPx + 'px';
+                        // compute width and horizontal placement based on concurrent columns at midpoint
+                        const eventsWidth = container.clientWidth || 600;
+                        const gap = 8;
+                        const columns = ev._columns || 1;
+                        const colWidth = Math.floor((eventsWidth - (columns-1)*gap) / columns);
+                        const leftOffset = (ev._lane || 0) * (colWidth + gap);
+                        el.style.left = leftOffset + 'px';
+                        el.style.width = colWidth + 'px';
+                        el.style.borderRadius = '10px';
+                        // event background: darker gray-tinted version of color; stripe on right is the identifier color
+                        el.style.background = mixWithGray(ev.color || '#3CA3D6', 0.6, 0.18);
+                        el.style.padding = '10px';
+                        el.style.boxSizing = 'border-box';
+                        el.style.overflow = 'hidden';
+                        el.style.display = 'flex';
+                        el.style.flexDirection = 'column';
+                        el.style.justifyContent = 'center';
+                        el.style.color = '#07232b';
+                        el.tabIndex = 0;
+                        el.setAttribute('role', 'button');
+                        el.setAttribute('aria-haspopup', 'dialog');
+                        el.setAttribute('aria-label', `${ev.title}. Open details.`);
+                        el.addEventListener('click', () => openTimelineEvent(ev));
+                        el.addEventListener('keydown', event => {
+                            if(event.key === 'Enter' || event.key === ' '){
+                                event.preventDefault();
+                                openTimelineEvent(ev);
+                            }
+                        });
+
+                        const title = document.createElement('div'); title.style.fontWeight='700'; title.textContent = ev.title;
+                        const sub = document.createElement('div'); sub.style.fontSize='0.85rem'; sub.style.color='rgba(7,35,43,0.8)'; sub.textContent=ev.subtitle||'';
+                        const body = document.createElement('div'); body.style.fontSize='0.8rem'; body.style.color='rgba(7,35,43,0.7)'; body.textContent=ev.body||'';
+                        el.appendChild(title); el.appendChild(sub); el.appendChild(body);
+
+                        // right-edge vertical stripe
+                        const edge = document.createElement('div');
+                        edge.style.position='absolute';
+                        edge.style.right='0';
+                        edge.style.top='6px';
+                        edge.style.bottom='6px';
+                        edge.style.width='6px';
+                        edge.style.borderTopRightRadius='10px';
+                        edge.style.borderBottomRightRadius='10px';
+                        edge.style.background = ev.color ? ev.color : 'var(--primary)';
+                        el.appendChild(edge);
+
+                        container.appendChild(el);
+                    }
+                }
+
+            function renderTimeline(){
+                buildYearLine();
+                layoutEvents();
+            }
+            window.renderTimeline = renderTimeline;
+
+            const eventDialog = document.getElementById('timeline-event-dialog');
+            function openTimelineEvent(event){
+                document.getElementById('timeline-event-title').textContent = event.title;
+                document.getElementById('timeline-event-subtitle').textContent = event.subtitle || '';
+                document.getElementById('timeline-event-body').textContent = event.body || '';
+                eventDialog.showModal();
+            }
+
+            eventDialog.querySelector('.timeline-dialog-close').addEventListener('click', () => eventDialog.close());
+            eventDialog.addEventListener('click', event => {
+                if(event.target === eventDialog) eventDialog.close();
+            });
+
+            // public helper to add events easily
+            window.addTimelineEvent = function(data){
+                // data: {start, end, title, subtitle, body, template, color, priority}
+                const sUnit = toUnit(data.start.year, data.start.season);
+                const eUnit = toUnit(data.end.year, data.end.season) + 1; // make end exclusive
+                const template = timelineTemplates[data.template];
+                const priority = Number.isFinite(data.priority) ? data.priority : 3;
+                events.push({start:sUnit, end:eUnit, title:data.title, subtitle:data.subtitle, body:data.body, color:data.color || template?.color, priority, order:events.length});
+                renderTimeline();
+            }
+
+            // sample events (three overlapping)
+            addTimelineEvent = window.addTimelineEvent; // expose short name
+            addTimelineEvent({start:{year:2022,season:'Spring'}, end:{year:2024,season:'Fall'}, title:'Robotics', subtitle:'Team project', body:'Robotics template example.', template:'robotics', priority:2});
+            addTimelineEvent({start:{year:2023,season:'Summer'}, end:{year:2025,season:'Spring'}, title:'FSAE', subtitle:'Engineering team', body:'FSAE template example.', template:'fsae', priority:2});
+            addTimelineEvent({start:{year:2026,season:'Spring'}, end:{year:2026,season:'Winter'}, title:'Boston Dynamics', subtitle:'Robotics', body:'Boston Dynamics template example.', template:'bostonDynamics', priority:3});
+            addTimelineEvent({start:{year:2022,season:'Spring'}, end:{year:2026,season:'Winter'}, title:'Cardinal Coders', subtitle:'Software team', body:'Cardinal Coders template example.', template:'cardinalCoders', priority:2});
+            // additional non-overlapping sample
+            addTimelineEvent({start:{year:2022,season:'Fall'}, end:{year:2023,season:'Spring'}, title:'UMass', subtitle:'School', body:'UMass template example.', template:'umass', priority:1});
+            // a solo event that does not concur with others (2025 Fall -> 2025 Winter)
+            addTimelineEvent({start:{year:2025,season:'Fall'}, end:{year:2025,season:'Winter'}, title:'Solo Event', subtitle:'Independent', body:'No concurrent events here.', color:'#F3F9FD', priority:4});
+
+            window.addEventListener('resize', ()=>{ setTimeout(renderTimeline,120); });
+            // initial render after DOM ready
+            setTimeout(renderTimeline,120);
+        })();
+    </script>
+</body>
+</html>
